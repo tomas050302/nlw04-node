@@ -12,7 +12,7 @@ export default {
     return response.json(surveys);
   },
 
-  async create(request: Request, response: Response) {
+  async store(request: Request, response: Response) {
     const { title, description } = request.body;
 
     const surveyRepository = getCustomRepository(SurveyRepository);

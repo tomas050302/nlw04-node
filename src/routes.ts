@@ -5,9 +5,9 @@ import SurveyController from './controllers/SurveyController';
 
 const routes = Router();
 
-routes.post('/user', UserController.create);
+routes.post('/user', UserController.store);
 
 routes.get('/survey', SurveyController.index);
-routes.post('/survey', SurveyController.create);
+routes.post('/survey', SurveyController.store);
 
 export default routes;

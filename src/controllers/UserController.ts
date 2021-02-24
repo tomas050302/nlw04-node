@@ -4,7 +4,7 @@ import { getCustomRepository } from 'typeorm';
 import UserRepository from '../repositories/UserRepository';
 
 export default {
-  async create(request: Request, response: Response) {
+  async store(request: Request, response: Response) {
     const { name, email } = request.body;
 
     const userRepository = getCustomRepository(UserRepository);

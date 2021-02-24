@@ -23,7 +23,7 @@ export default {
     try {
       const data = await userRepository.save(user);
 
-      return response.status(200).json(data);
+      return response.status(201).json(data);
     } catch (err) {
       return response.status(400).json(err);
     }

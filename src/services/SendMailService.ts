@@ -1,3 +1,7 @@
+import path from 'path';
+import fs from 'fs';
+
+import handlebars from 'handlebars';
 import nodemailer, { Transporter } from 'nodemailer';
 
 async function createAccount(): Promise<Transporter> {
@@ -16,12 +20,30 @@ async function createAccount(): Promise<Transporter> {
 
 export default {
   async execute(to: string, subject: string, body: string) {
+    const templatePath = path.resolve(
+      __dirname,
+      '..',
+      'views',
+      'email',
+      'npsMail.hbs'
+    );
+
+    const templateContent = fs.readFileSync(templatePath).toString('utf-8');
+
+    const mailTemplate = handlebars.compile(templateContent);
+
+    const html = mailTemplate({
+      name: to,
+      title: subject,
+      description: body
+    });
+
     const client = await createAccount();
 
     const message = await client.sendMail({
       to,
       subject,
-      html: body,
+      html,
       from: 'NPS <noreply@nps.com>'
     });
 

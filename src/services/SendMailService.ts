@@ -19,30 +19,28 @@ async function createAccount(): Promise<Transporter> {
 }
 
 export default {
-  async execute(to: string, subject: string, body: string) {
-    const templatePath = path.resolve(
-      __dirname,
-      '..',
-      'views',
-      'email',
-      'npsMail.hbs'
-    );
-
-    const templateContent = fs.readFileSync(templatePath).toString('utf-8');
+  async execute(
+    to: string,
+    variables: {
+      user_id: string;
+      name: string;
+      title: string;
+      description: string;
+      url: string;
+    },
+    path: string
+  ) {
+    const templateContent = fs.readFileSync(path).toString('utf-8');
 
     const mailTemplate = handlebars.compile(templateContent);
 
-    const html = mailTemplate({
-      name: to,
-      title: subject,
-      description: body
-    });
+    const html = mailTemplate(variables);
 
     const client = await createAccount();
 
     const message = await client.sendMail({
       to,
-      subject,
+      subject: variables.title,
       html,
       from: 'NPS <noreply@nps.com>'
     });

@@ -5,6 +5,7 @@ import UserRepository from '../repositories/UserRepository';
 import SurveyRepository from '../repositories/SurveyRepository';
 import SurveyUserRepository from '../repositories/SurveyUserRepository';
 import SendMailService from '../services/SendMailService';
+import path from 'path';
 
 export default {
   async execute(request: Request, response: Response) {
@@ -24,6 +25,39 @@ export default {
     if (!existingSurvey)
       return response.status(400).json({ error: 'Survey not found' });
 
+    const existingSurveyUser = await surveyUserRepository.findOne({
+      where: [{ user_id: existingUser.id }, { value: null }],
+      relations: ['user', 'survey']
+    });
+
+    const templatePath = path.resolve(
+      __dirname,
+      '..',
+      'views',
+      'email',
+      'npsMail.hbs'
+    );
+
+    const url = process.env.MAIL_URL;
+
+    if (!url) {
+      return response.status(400).json({ error: 'Invalid mail URL provided' });
+    }
+
+    const variables = {
+      user_id: existingUser.id,
+      name: existingUser.name,
+      title: existingSurvey.title,
+      description: existingSurvey.description,
+      url
+    };
+
+    if (existingSurveyUser) {
+      await SendMailService.execute(email, variables, templatePath);
+
+      return response.json(existingSurveyUser);
+    }
+
     try {
       const surveyUser = surveyUserRepository.create({
         user_id: existingUser.id,
@@ -32,11 +66,7 @@ export default {
 
       await surveyUserRepository.save(surveyUser);
 
-      await SendMailService.execute(
-        email,
-        existingSurvey.title,
-        existingSurvey.description
-      );
+      await SendMailService.execute(email, variables, templatePath);
 
       return response.status(201).json(surveyUser);
     } catch (err) {

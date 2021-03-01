@@ -3,9 +3,22 @@ import { getCustomRepository } from 'typeorm';
 
 import UserRepository from '../repositories/UserRepository';
 
+import * as yup from 'yup';
+
 export default {
   async store(request: Request, response: Response) {
     const { name, email } = request.body;
+
+    const schema = yup.object().shape({
+      name: yup.string().required('Name is required'),
+      email: yup.string().email().required('E-mail is required')
+    });
+
+    try {
+      await schema.validate(request.body, { abortEarly: false });
+    } catch (err) {
+      return response.status(400).json(err);
+    }
 
     const userRepository = getCustomRepository(UserRepository);
 

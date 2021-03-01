@@ -14,11 +14,7 @@ export default {
       email: yup.string().email().required('E-mail is required')
     });
 
-    try {
-      await schema.validate(request.body, { abortEarly: false });
-    } catch (err) {
-      return response.status(400).json(err);
-    }
+    await schema.validate(request.body, { abortEarly: false });
 
     const userRepository = getCustomRepository(UserRepository);
 

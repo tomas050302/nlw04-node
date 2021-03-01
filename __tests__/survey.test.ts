@@ -4,12 +4,20 @@ import faker from 'faker';
 import app from '../src/server';
 
 import createConnection from '../src/database';
+import { getConnection } from 'typeorm';
 
 describe('Surveys', () => {
   beforeAll(async () => {
     const connection = await createConnection();
 
     await connection.runMigrations();
+  });
+
+  afterAll(async () => {
+    const connection = await getConnection();
+
+    await connection.dropDatabase();
+    await connection.close();
   });
 
   it('should be able to create a new survey', async () => {

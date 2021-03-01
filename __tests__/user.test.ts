@@ -4,12 +4,20 @@ import faker from 'faker';
 import app from '../src/server';
 
 import createConnection from '../src/database';
+import { getConnection } from 'typeorm';
 
 describe('User', () => {
   beforeAll(async () => {
     const connection = await createConnection();
 
     await connection.runMigrations();
+  });
+
+  afterAll(async () => {
+    const connection = await getConnection();
+
+    await connection.dropDatabase();
+    await connection.close();
   });
 
   const firstName = faker.name.firstName();

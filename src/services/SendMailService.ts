@@ -22,7 +22,7 @@ export default {
   async execute(
     to: string,
     variables: {
-      user_id: string;
+      id: string;
       name: string;
       title: string;
       description: string;

@@ -26,7 +26,7 @@ export default {
       return response.status(400).json({ error: 'Survey not found' });
 
     const existingSurveyUser = await surveyUserRepository.findOne({
-      where: [{ user_id: existingUser.id }, { value: null }],
+      where: { user_id: existingUser.id, value: null },
       relations: ['user', 'survey']
     });
 
@@ -45,7 +45,7 @@ export default {
     }
 
     const variables = {
-      user_id: existingUser.id,
+      id: '',
       name: existingUser.name,
       title: existingSurvey.title,
       description: existingSurvey.description,
@@ -53,6 +53,8 @@ export default {
     };
 
     if (existingSurveyUser) {
+      variables.id = existingSurveyUser.id;
+
       await SendMailService.execute(email, variables, templatePath);
 
       return response.json(existingSurveyUser);
@@ -65,6 +67,8 @@ export default {
       });
 
       await surveyUserRepository.save(surveyUser);
+
+      variables.id = surveyUser.id;
 
       await SendMailService.execute(email, variables, templatePath);
 
